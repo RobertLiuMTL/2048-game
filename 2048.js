@@ -101,6 +101,7 @@ function generate_random_number(){
 
 function upArrowPressed(){
     var hasMoved = moveValuesUp();
+//    moveValuesUp();
 
     //On additionne les cases de même valeur
     for(var i = 1 ; i<dimension;i++){
@@ -112,13 +113,16 @@ function upArrowPressed(){
             }
         }
     }
-    if (hasMoved || moveValuesUp())
+    if (moveValuesUp() || hasMoved)
         updateGame();
+//    moveValuesUp();
+
 }
 
 
 function downArrowPressed(){
     var hasMoved = moveValuesDown();
+//    moveValuesDown();
 
     //Additionner les cases de même valeur
     for(var i = dimension-1 ; i>0;i--){
@@ -130,12 +134,14 @@ function downArrowPressed(){
             }
         }
     }
-    if (hasMoved || moveValuesDown())
+    if (moveValuesDown() || hasMoved)
         updateGame();
+//    moveValuesDown();
 }
 
 function leftArrowPressed(){
     var hasMoved = moveValuesToLeft();
+//    moveValuesToLeft();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -144,15 +150,18 @@ function leftArrowPressed(){
                 grille_jeu[i][j-1]+=grille_jeu[i][j];
                 grille_jeu[i][j]=0;
                 hasMoved = true;
+
             }
         }
     }
-    if (hasMoved || moveValuesToLeft())
+    if (moveValuesToLeft() || hasMoved)
         updateGame();
+//    moveValuesToLeft();
 }
 
 function rightArrowPressed(){
     var hasMoved = moveValuesToRight();
+//    moveValuesToRight();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -164,8 +173,22 @@ function rightArrowPressed(){
             }
         }
     }
-    if (hasMoved || moveValuesToRight())
+    if (moveValuesToRight() || hasMoved)
         updateGame();
+
+        
+//    moveValuesToRight();
+
+}
+
+function updateGame(){
+    if(generate_random_number()==false){
+        if (gameIsOver()){
+            alert("Le jeu est plein!!");
+            startNewGame();
+        }
+   	}
+   	update_screen();
 }
 
 function moveValuesUp(){
@@ -175,11 +198,11 @@ function moveValuesUp(){
             var k = i;
             while(k > 0){
                 if(grille_jeu[k-1][j]==0 && grille_jeu[k][j] != 0){
-                    grille_jeu[k-1][j] = grille_jeu[k][j];
+                    grille_jeu[k-1][j]=grille_jeu[k][j];
                     grille_jeu[k][j]=0;
                     hasMoved = true;
                 }
-                k--;	
+                k--;
             }        		
         }
     }
@@ -198,9 +221,10 @@ function moveValuesDown(){
                     hasMoved = true;
                 }
                 k++;
+                
             }
         }
-    }
+    }	
     return hasMoved;
 }
 
@@ -211,7 +235,7 @@ function moveValuesToLeft(){
         for(var j = 1 ; j<dimension;j++){
             var k = j;
             while(k > 0){
-                if(grille_jeu[i][k-1]==0 && grille_jeu[i][k]!=0){
+                if(grille_jeu[i][k-1]==0 && grille_jeu[i][k] != 0){
                     grille_jeu[i][k-1]=grille_jeu[i][k];
                     grille_jeu[i][k]=0;
                     hasMoved = true;
@@ -240,17 +264,6 @@ function moveValuesToRight(){
         }
     }
     return hasMoved;
-}
-
-
-function updateGame(){
-    if(generate_random_number()==false){
-        if (gameIsOver()){
-            alert("Le jeu est plein!!");
-            startNewGame();
-        }
-   	}
-   	update_screen();
 }
 
 
