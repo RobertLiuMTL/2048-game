@@ -165,16 +165,16 @@ function rightArrowPressed(){
             }
         }
     }
-    if (moveValuesToRight() || hasMoved)
+    if (moveValuesToRight() || hasMoved){
         updateGame();
+    } else {
+        checkIfGameIsOver();
+    }
 }
 
 function updateGame(){
     if(generate_random_number()==false){
-        if (gameIsOver()){
-            alert("Le jeu est plein!!");
-            startNewGame();
-        }
+        checkIfGameIsOver();
    	}
    	update_screen();
 }
@@ -267,8 +267,7 @@ function update_screen(){
 			}else{
 				tds[dimension*i+j].innerHTML=grille_jeu[i][j];
 
-
-				//Gestion des couleurs pour faciliter la visibilité
+                //Gestion des couleurs pour faciliter la visibilité
 				if(grille_jeu[i][j]>8){
 					tds[dimension*i+j].style.backgroundColor='orange';
 				}else if(grille_jeu[i][j]>16){
@@ -283,27 +282,23 @@ function update_screen(){
 }
 
 //Lorsque le jeu est plein, vérifie s'il existe encore des déplacements possibles
-function gameIsOver(){
+function checkIfGameIsOver(){
+    var gameIsOver = true;
     
     for(var i = 0 ; i < dimension; i++){
         for(var j = 1 ; j < dimension; j++){
-            if(grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
-                return false;
-
+            if (j > 0 && grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
+                gameIsOver = false;
+            }
+            if (i > 0 && grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
+                gameIsOver = false;
             }
         }
     }
-    
-    //On additionne les cases de même valeur
-    for(var i = 1 ; i < dimension;i++){
-        for(var j = 0 ; j < dimension;j++){
-            if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
-                return false;
-            }
-        }
+    if (gameIsOver){
+        alert("Le jeu est plein!");
+        startNewGame();
     }
-    
-    return true;
 }
 
 
