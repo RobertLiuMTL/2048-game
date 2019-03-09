@@ -1,8 +1,6 @@
 var dimension;
-
 var grille_jeu;
 
-var fin_partie = false;
 /*
 Fonction appelée au démarrage de la page.
 */
@@ -18,75 +16,64 @@ function main(){
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
     */
 
+    startNewGame();
 
-	//Demander à l'utilisateur de choisir les dimensions.
+};
+
+
+function startNewGame(){
+    
+    grille_jeu=[];
+    
+    //Demander à l'utilisateur de choisir les dimensions.
 	do{
 		dimension = prompt("Veuillez entrer un chiffre (3 et +) afin de choisir la dimension du jeu (Par exemple, 4 pour un jeu 4X4)");
-	}while(isNaN(dimension) || dimension=="" || dimension<3);
+	}while(isNaN(dimension)|| dimension=="" || dimension<3);
 
 	document.getElementById("dimensions_jeu").innerHTML = "Le jeu 2048 avec en dimensions "+dimension+"X"+dimension;
 
-	tableCreate(dimension);
-
-};
+	initialSetup(dimension);
+}
 
 /*
 Fonction appelée pour créer le tableau initial
 */
-function tableCreate(dimension) {
-	var nombre = 2;
+function initialSetup(dimension) {
+    
+    var body = document.getElementsByTagName('body')[0];
+	var tbl = document.createElement('table');
+	var tbdy = document.createElement('tbody');
 
 	//Création de la représentation 2D de la grille de jeu
 	//Pour faciliter les manipulations
-	grille_jeu=[];
+	
 	for (var i = 0 ; i < dimension ; i++, grille_jeu.push(temp)){
 		var temp = [];
-		for(var j = 0 ; j < dimension ; j++){
+        var tr = document.createElement('tr');
+		
+        for(var j = 0 ; j < dimension ; j++){
 			temp.push(0);
-		}
-	}
-
-	var body = document.getElementsByTagName('body')[0];
-	var tbl = document.createElement('table');
-	var tbdy = document.createElement('tbody');
-	for (var i = 0; i < dimension; i++) {
-		var tr = document.createElement('tr');
-		for (var j = 0; j < dimension; j++) {
-
-			var td = document.createElement('td');
+            var td = document.createElement('td');
 			tr.appendChild(td);
 		}
-		tbdy.appendChild(tr);
+        tbdy.appendChild(tr);
 	}
 	tbl.appendChild(tbdy);
 	body.appendChild(tbl);
 
-	initialSetup();
-
-};
-
-//Fonction plutôt laide pour initialiser le jeu.
-function initialSetup(){
-	
-	var nombre = 2;
-	
-
-	while(nombre>0){
-		if(generate_random_number()==true){
-			nombre--;
-		}
-	}
+	for (var nombre = 0; nombre < 2; nombre ++){
+        generate_random_number();
+    }
+    
 	update_screen();
-	
 };
+
 
 /*
 Fonction qui permet de générer aléatoirement un 2 ou un 4 dans une case vide du jeu.
 */
 function generate_random_number(){
-
 	var empty_cell = false;
-
 	var found_cells = [];
 
 	//Vérifier s'il reste une case vide.
@@ -95,247 +82,161 @@ function generate_random_number(){
 			if(grille_jeu[i][j]==0){
 				empty_cell=true;
 				found_cells.push([i,j]);
-
 			}
 		}
 	}
+    
+    if (empty_cell){
+        var tds = document.getElementsByTagName("td");
+        var length = tds.length;
+        var two_or_four = Math.random() > 0.5? 4: 2;
 
-	if(empty_cell==false){
-		return false;
-	}
-
-	var tds = document.getElementsByTagName("td");
-	var length = tds.length;
-	
-	var two_or_four = Math.random();
-	if (two_or_four>0.5){
-		two_or_four=4;
-	}else{
-		two_or_four=2;
-	}
-
-	//On choisit une cellule non-vide au hasard.
-	//Math.floor pour obtenir une fourchette exclusive [0,found_cells.length[
-	var random = Math.floor(found_cells.length*Math.random());
-
-	grille_jeu[found_cells[random][0]][found_cells[random][1]]=two_or_four;
-	return true;
-	
+        //On choisit une cellule non-vide au hasard.
+        //Math.floor pour obtenir une fourchette exclusive [0,found_cells.length[
+        var random = Math.floor(found_cells.length*Math.random());
+        grille_jeu[found_cells[random][0]][found_cells[random][1]]=two_or_four;
+    }
+    return empty_cell;
 }
 
+function upArrowPressed(){
+    // up arrow
+    //alert(event.key);
 
-/*Fonction responsable de la vérification des coups
-Paramètre : key = la touche appuyée par l'utilisateur.
-*/
-function update_game(key){
-	//alert("Updated!");
-	//var tds = document.getElementsByTagName("td");
-	if (event.key == 'w' || event.keyCode == '38') {
-        // up arrow
-        //alert(event.key);
+    moveValuesUp();
 
-        //Tenter de déplacer les chiffres vers le haut
-        for(var i = 1 ; i<dimension;i++){
-        	for(var j = 0 ; j<dimension;j++){
-        		var k = i;
-        		while(k > 0){
-        			if(grille_jeu[k-1][j]==0){
-        				grille_jeu[k-1][j]=grille_jeu[k][j];
-        				grille_jeu[k][j]=0;
-        			}
-        			k--;	
-        		}        		
-        	}
-        }
-
-
-        for(var i = 1 ; i<dimension;i++){
-        	for(var j = 0 ; j<dimension;j++){
-        		if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
-        			grille_jeu[i-1][j]+=grille_jeu[i][j];
-        			grille_jeu[i][j]=0;
-
-        		}
-        	}
-        }
-
-        //Tenter de déplacer les chiffres vers le haut
-        for(var i = 1 ; i<dimension;i++){
-        	for(var j = 0 ; j<dimension;j++){
-        		var k = i;
-        		while(k > 0){
-        			if(grille_jeu[k-1][j]==0){
-        				grille_jeu[k-1][j]=grille_jeu[k][j];
-        				grille_jeu[k][j]=0;
-        			}
-        			k--;	
-        		}        		
-        	}
+    //On additionne les cases de même valeur
+    for(var i = 1 ; i<dimension;i++){
+        for(var j = 0 ; j<dimension;j++){
+            if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
+                grille_jeu[i-1][j]+=grille_jeu[i][j];
+                grille_jeu[i][j]=0;
+            }
         }
     }
-    //vérifier depuis le bas
-    else if (event.key== 's' || event.keyCode == '40') {
-        // down arrow
-        //alert(event.key);
 
-        //tenter de bouger les chiffres vers le bas
-        if(dimension>2){
-        	for(var i = dimension-1 ; i>=0;i--){
-        		for(var j = 0 ; j<dimension;j++){
-        			var k = i;
-        			while(k<dimension-1){
-        				if(grille_jeu[k+1][j]==0){
-        					grille_jeu[k+1][j]=grille_jeu[k][j];
-        					grille_jeu[k][j]=0;
-        				}
-        				k++;
-        			}
-        		}
-        	}	
-        }
-        
+    moveValuesUp();
+}
 
-        for(var i = dimension-1 ; i>0;i--){
-        	for(var j = 0 ; j<dimension;j++){
-        		if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
-        			grille_jeu[i][j]+=grille_jeu[i-1][j];
-        			grille_jeu[i-1][j]=0;
 
-        		}
-        	}
-        }
+function downArrowPressed(){
+    moveValuesDown();
 
-        //tenter de bouger les chiffres vers le bas
-        if(dimension>2){
-        	for(var i = dimension-1 ; i>=0;i--){
-        		for(var j = 0 ; j<dimension;j++){
-        			var k = i;
-        			while(k<dimension-1){
-        				if(grille_jeu[k+1][j]==0){
-        					grille_jeu[k+1][j]=grille_jeu[k][j];
-        					grille_jeu[k][j]=0;
-        				}
-        				k++;
-        			}
-        		}
-        	}	
+    //Additionner les cases de même valeur
+    for(var i = dimension-1 ; i>0;i--){
+        for(var j = 0 ; j<dimension;j++){
+            if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
+                grille_jeu[i][j]+=grille_jeu[i-1][j];
+                grille_jeu[i-1][j]=0;
+
+            }
         }
     }
-    //vérifier depuis la gauche
-    else if (event.key == 'a' || event.keyCode == '37') {
-       	// left arrow
-       	//alert(event.key);
 
-
-       	//Tenter de déplacer les chiffres vers la gauche
-       	for(var i = 0 ; i<dimension;i++){
-       		for(var j = 1 ; j<dimension;j++){
-       			var k = j;
-       			while(k > 0){
-	       			if(grille_jeu[i][k-1]==0){
-	       				grille_jeu[i][k-1]=grille_jeu[i][k];
-	       				grille_jeu[i][k]=0;
-	       			}
-	       			k--;	
-	       		}        		
-	       	}
-       }
-
-       	for(var i = 0 ; i<dimension;i++){
-	       	for(var j = 1 ; j<dimension;j++){
-	       		if(grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
-	       			grille_jeu[i][j-1]+=grille_jeu[i][j];
-	       			grille_jeu[i][j]=0;
-
-	       		}
-	       	}
-       	}
-
-       	//Tenter de déplacer les chiffres vers la gauche
-       	for(var i = 0 ; i<dimension;i++){
-	       	for(var j = 1 ; j<dimension;j++){
-	       		var k = j;
-	       		while(k > 0){
-	       			if(grille_jeu[i][k-1]==0){
-	       				grille_jeu[i][k-1]=grille_jeu[i][k];
-	       				grille_jeu[i][k]=0;
-	       			}
-	       			k--;	
-	       		}        		
-       		}
-       	}
-   }
-   //il faudra vérifier par la droite en premier
-   else if (event.key == 'd' || event.keyCode == '39') {
-       	// right arrow
-       	//alert(event.key);
-
-       	//Tenter de déplacer les chiffres vers la droite
-       	if(dimension>2){
-	       	for(var i = 0 ; i<dimension;i++){
-	       		for(var j = dimension-1 ; j>=0;j--){
-	       			var k = j;
-	       			while(k<dimension-1){
-	       				if(grille_jeu[i][k+1]==0){
-	       					grille_jeu[i][k+1]=grille_jeu[i][k];
-	       					grille_jeu[i][k]=0;
-	       				}
-	       				k++;
-	       			}       		
-	       		}
-       		}
-       	}
-
-
-       	for(var i = 0 ; i<dimension;i++){
-	       	for(var j = dimension-1 ; j>=0;j--){
-	       		if(grille_jeu[i][j]==grille_jeu[i][j-1] && grille_jeu[i][j]!=0){
-	       			grille_jeu[i][j]+=grille_jeu[i][j-1];
-	       			grille_jeu[i][j-1]=0;
-
-	       		}
-	       	}
-       	}
-
-       	//Tenter de déplacer les chiffres vers la droite
-       	if(dimension>2){
-       		for(var i = 0 ; i<dimension;i++){
-	       		for(var j = dimension-1 ; j>=0;j--){
-	       			var k = j;
-	       			while(k<dimension-1){
-	       				if(grille_jeu[i][k+1]==0){
-	       					grille_jeu[i][k+1]=grille_jeu[i][k];
-	       					grille_jeu[i][k]=0;
-	       				}
-	       				k++;
-	       			}       		
-	       		}
-	       	}
-       	}
-   	}
-
-   	if(generate_random_number()==false){
-   		//alert("Le jeu est plein!!");
-   	}
-   	update_screen();
-
+    moveValuesDown();
 }
 
-/*
-Fonction qui est appelée à chaque entrée de l'utilisateur. Vérifie si les cases peuvent être déplacées.
-Si oui, ajouter un nombre aléatoire sur la grille.
-*/
-function check_validity(move){
-	if(move=="up"){
+function leftArrowPressed(){
+    moveValuesToLeft();
+    
+    //Additionner les cases de même valeur
+    for(var i = 0 ; i<dimension;i++){
+        for(var j = 1 ; j<dimension;j++){
+            if(grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
+                grille_jeu[i][j-1]+=grille_jeu[i][j];
+                grille_jeu[i][j]=0;
 
-	}else if(move=="down"){
+            }
+        }
+    }
 
-	}else if(move=="left"){
-
-	}else if(move=="right"){
-
-	}
+    moveValuesToLeft();
 }
+
+function rightArrowPressed(){
+    moveValuesToRight();
+    
+    //Additionner les cases de même valeur
+    for(var i = 0 ; i<dimension;i++){
+        for(var j = dimension-1 ; j>=0;j--){
+            if(grille_jeu[i][j]==grille_jeu[i][j-1] && grille_jeu[i][j]!=0){
+                grille_jeu[i][j]+=grille_jeu[i][j-1];
+                grille_jeu[i][j-1]=0;
+
+            }
+        }
+    }
+    moveValuesToRight();
+}
+
+function moveValuesUp(){
+    //Tenter de déplacer les chiffres vers le haut
+    for(var i = 1 ; i<dimension;i++){
+        for(var j = 0 ; j<dimension;j++){
+            var k = i;
+            while(k > 0){
+                if(grille_jeu[k-1][j]==0){
+                    grille_jeu[k-1][j]=grille_jeu[k][j];
+                    grille_jeu[k][j]=0;
+                }
+                k--;	
+            }        		
+        }
+    }
+}
+
+function moveValuesDown(){
+    //tenter de bouger les chiffres vers le bas
+    if(dimension>2){
+        for(var i = dimension-1 ; i>=0;i--){
+            for(var j = 0 ; j<dimension;j++){
+                var k = i;
+                while(k<dimension-1){
+                    if(grille_jeu[k+1][j]==0){
+                        grille_jeu[k+1][j]=grille_jeu[k][j];
+                        grille_jeu[k][j]=0;
+                    }
+                    k++;
+                }
+            }
+        }	
+    }
+}
+
+
+function moveValuesToLeft(){
+    for(var i = 0 ; i<dimension;i++){
+        for(var j = 1 ; j<dimension;j++){
+            var k = j;
+            while(k > 0){
+                if(grille_jeu[i][k-1]==0){
+                    grille_jeu[i][k-1]=grille_jeu[i][k];
+                    grille_jeu[i][k]=0;
+                }
+                k--;	
+            }        		
+        }
+    }
+}
+
+
+function moveValuesToRight(){
+    if(dimension>2){
+        for(var i = 0 ; i<dimension;i++){
+            for(var j = dimension-1 ; j>=0;j--){
+                var k = j;
+                while(k<dimension-1){
+                    if(grille_jeu[i][k+1]==0){
+                        grille_jeu[i][k+1]=grille_jeu[i][k];
+                        grille_jeu[i][k]=0;
+                    }
+                    k++;
+                }       		
+            }
+        }
+    }
+}
+
 
 //Fonction appelée pour mettre à jour l'affichage du jeu
 //à partir de la variable globale grille_jeu
@@ -364,9 +265,54 @@ function update_screen(){
 	}
 }
 
+//Lorsque le jeu est plein, vérifie s'il existe encore des déplacements possibles
+function gameIsOver(){
+    
+    for(var i = 0 ; i < dimension; i++){
+        for(var j = 1 ; j < dimension; j++){
+            if(grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
+                return false;
+
+            }
+        }
+    }
+    
+    //On additionne les cases de même valeur
+    for(var i = 1 ; i < dimension;i++){
+        for(var j = 0 ; j < dimension;j++){
+            if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
 
 //Listener pour écouter les actions de l'utilisateur.
-document.addEventListener('keydown', function(event){
-
-	update_game(event);
-} );
+document.onkeydown = function(e) {
+    switch (e.keyCode) {
+        case 37:
+            leftArrowPressed();
+            break;
+        case 38:
+            upArrowPressed();
+            break;
+        case 39:
+            rightArrowPressed();
+            break;
+        case 40:
+            downArrowPressed();
+            break;
+        default:
+            break;
+    }
+    if(generate_random_number()==false){
+        if (gameIsOver()){
+            alert("Le jeu est plein!!");
+            startNewGame();
+        }
+   	}
+   	update_screen();
+};
