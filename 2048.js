@@ -101,7 +101,6 @@ function generate_random_number(){
 
 function upArrowPressed(){
     var hasMoved = moveValuesUp();
-//    moveValuesUp();
 
     //On additionne les cases de même valeur
     for(var i = 1 ; i<dimension;i++){
@@ -115,14 +114,11 @@ function upArrowPressed(){
     }
     if (moveValuesUp() || hasMoved)
         updateGame();
-//    moveValuesUp();
-
 }
 
 
 function downArrowPressed(){
     var hasMoved = moveValuesDown();
-//    moveValuesDown();
 
     //Additionner les cases de même valeur
     for(var i = dimension-1 ; i>0;i--){
@@ -136,12 +132,10 @@ function downArrowPressed(){
     }
     if (moveValuesDown() || hasMoved)
         updateGame();
-//    moveValuesDown();
 }
 
 function leftArrowPressed(){
     var hasMoved = moveValuesToLeft();
-//    moveValuesToLeft();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -156,12 +150,10 @@ function leftArrowPressed(){
     }
     if (moveValuesToLeft() || hasMoved)
         updateGame();
-//    moveValuesToLeft();
 }
 
 function rightArrowPressed(){
     var hasMoved = moveValuesToRight();
-//    moveValuesToRight();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -175,10 +167,6 @@ function rightArrowPressed(){
     }
     if (moveValuesToRight() || hasMoved)
         updateGame();
-
-        
-//    moveValuesToRight();
-
 }
 
 function updateGame(){
