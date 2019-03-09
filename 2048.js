@@ -100,10 +100,7 @@ function generate_random_number(){
 }
 
 function upArrowPressed(){
-    // up arrow
-    //alert(event.key);
-
-    moveValuesUp();
+    var hasMoved = moveValuesUp();
 
     //On additionne les cases de même valeur
     for(var i = 1 ; i<dimension;i++){
@@ -111,16 +108,17 @@ function upArrowPressed(){
             if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
                 grille_jeu[i-1][j]+=grille_jeu[i][j];
                 grille_jeu[i][j]=0;
+                hasMoved = true;
             }
         }
     }
-
-    moveValuesUp();
+    if (hasMoved || moveValuesUp())
+        updateGame();
 }
 
 
 function downArrowPressed(){
-    moveValuesDown();
+    var hasMoved = moveValuesDown();
 
     //Additionner les cases de même valeur
     for(var i = dimension-1 ; i>0;i--){
@@ -128,16 +126,16 @@ function downArrowPressed(){
             if(grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
                 grille_jeu[i][j]+=grille_jeu[i-1][j];
                 grille_jeu[i-1][j]=0;
-
+                hasMoved = true;
             }
         }
     }
-
-    moveValuesDown();
+    if (hasMoved || moveValuesDown())
+        updateGame();
 }
 
 function leftArrowPressed(){
-    moveValuesToLeft();
+    var hasMoved = moveValuesToLeft();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -145,16 +143,16 @@ function leftArrowPressed(){
             if(grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
                 grille_jeu[i][j-1]+=grille_jeu[i][j];
                 grille_jeu[i][j]=0;
-
+                hasMoved = true;
             }
         }
     }
-
-    moveValuesToLeft();
+    if (hasMoved || moveValuesToLeft())
+        updateGame();
 }
 
 function rightArrowPressed(){
-    moveValuesToRight();
+    var hasMoved = moveValuesToRight();
     
     //Additionner les cases de même valeur
     for(var i = 0 ; i<dimension;i++){
@@ -162,79 +160,97 @@ function rightArrowPressed(){
             if(grille_jeu[i][j]==grille_jeu[i][j-1] && grille_jeu[i][j]!=0){
                 grille_jeu[i][j]+=grille_jeu[i][j-1];
                 grille_jeu[i][j-1]=0;
-
+                hasMoved = true;
             }
         }
     }
-    moveValuesToRight();
+    if (hasMoved || moveValuesToRight())
+        updateGame();
 }
 
 function moveValuesUp(){
-    //Tenter de déplacer les chiffres vers le haut
+    var hasMoved = false;
     for(var i = 1 ; i<dimension;i++){
         for(var j = 0 ; j<dimension;j++){
             var k = i;
             while(k > 0){
-                if(grille_jeu[k-1][j]==0){
-                    grille_jeu[k-1][j]=grille_jeu[k][j];
+                if(grille_jeu[k-1][j]==0 && grille_jeu[k][j] != 0){
+                    grille_jeu[k-1][j] = grille_jeu[k][j];
                     grille_jeu[k][j]=0;
+                    hasMoved = true;
                 }
                 k--;	
             }        		
         }
     }
+    return hasMoved;
 }
 
 function moveValuesDown(){
-    //tenter de bouger les chiffres vers le bas
-    if(dimension>2){
-        for(var i = dimension-1 ; i>=0;i--){
-            for(var j = 0 ; j<dimension;j++){
-                var k = i;
-                while(k<dimension-1){
-                    if(grille_jeu[k+1][j]==0){
-                        grille_jeu[k+1][j]=grille_jeu[k][j];
-                        grille_jeu[k][j]=0;
-                    }
-                    k++;
+    var hasMoved = false;
+    for(var i = dimension-1 ; i>=0;i--){
+        for(var j = 0 ; j<dimension;j++){
+            var k = i;
+            while(k<dimension-1){
+                if(grille_jeu[k+1][j]==0 && grille_jeu[k][j] != 0){
+                    grille_jeu[k+1][j]=grille_jeu[k][j];
+                    grille_jeu[k][j]=0;
+                    hasMoved = true;
                 }
+                k++;
             }
-        }	
+        }
     }
+    return hasMoved;
 }
 
 
 function moveValuesToLeft(){
+    var hasMoved = false;
     for(var i = 0 ; i<dimension;i++){
         for(var j = 1 ; j<dimension;j++){
             var k = j;
             while(k > 0){
-                if(grille_jeu[i][k-1]==0){
+                if(grille_jeu[i][k-1]==0 && grille_jeu[i][k]!=0){
                     grille_jeu[i][k-1]=grille_jeu[i][k];
                     grille_jeu[i][k]=0;
+                    hasMoved = true;
                 }
                 k--;	
             }        		
         }
     }
+    return hasMoved;
 }
 
 
 function moveValuesToRight(){
-    if(dimension>2){
-        for(var i = 0 ; i<dimension;i++){
-            for(var j = dimension-1 ; j>=0;j--){
-                var k = j;
-                while(k<dimension-1){
-                    if(grille_jeu[i][k+1]==0){
-                        grille_jeu[i][k+1]=grille_jeu[i][k];
-                        grille_jeu[i][k]=0;
-                    }
-                    k++;
-                }       		
-            }
+    var hasMoved = false;
+    for(var i = 0 ; i<dimension;i++){
+        for(var j = dimension-1 ; j>=0;j--){
+            var k = j;
+            while(k<dimension-1){
+                if(grille_jeu[i][k+1]==0 && grille_jeu[i][k] != 0){
+                    grille_jeu[i][k+1]=grille_jeu[i][k];
+                    grille_jeu[i][k]=0;
+                    hasMoved = true;
+                }
+                k++;
+            }       		
         }
     }
+    return hasMoved;
+}
+
+
+function updateGame(){
+    if(generate_random_number()==false){
+        if (gameIsOver()){
+            alert("Le jeu est plein!!");
+            startNewGame();
+        }
+   	}
+   	update_screen();
 }
 
 
@@ -308,11 +324,4 @@ document.onkeydown = function(e) {
         default:
             break;
     }
-    if(generate_random_number()==false){
-        if (gameIsOver()){
-            alert("Le jeu est plein!!");
-            startNewGame();
-        }
-   	}
-   	update_screen();
 };
