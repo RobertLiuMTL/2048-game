@@ -1,5 +1,6 @@
 var dimension;
 var grille_jeu;
+var score = 0;
 
 /*
 Fonction appelée au démarrage de la page.
@@ -22,18 +23,44 @@ function main(){
 
 
 function startNewGame(){
-    
     grille_jeu=[];
-    
+
+    var scorebox = document.getElementById('scorebox');
+    scorebox.innerHTML="Score = "+score;
+        
     //Demander à l'utilisateur de choisir les dimensions.
 	do{
 		dimension = prompt("Veuillez entrer un chiffre (3 et +) afin de choisir la dimension du jeu (Par exemple, 4 pour un jeu 4X4)");
-	}while(isNaN(dimension)|| dimension=="" || dimension<3);
+	}while(dimension!=null&&(isNaN(dimension)|| dimension=="" || dimension<3));
 
-	document.getElementById("dimensions_jeu").innerHTML = "Le jeu 2048 avec en dimensions "+dimension+"X"+dimension;
-
-	initialSetup(dimension);
+    if(dimension==null){
+        alert("Vous avez choisi de ne pas jouer au jeu ; honete à vous!");
+        window.close();
+    }else{
+        document.getElementById("dimensions_jeu").innerHTML = "Le jeu 2048 avec en dimensions "+dimension+"X"+dimension;
+        initialSetup(dimension);        
+    }
+	
 }
+
+
+/*
+fonction appelée pour nettoyer le jeu.
+*/
+function clearGame(){
+    
+
+    var vieille_partie = document.getElementById("table");
+    var parent = vieille_partie.parentElement;
+    parent.removeChild(vieille_partie);
+    //Réinitialiser les variables globales.
+    grille_jeu=[];
+    dimension=0;
+    score=0;
+
+    startNewGame();
+}
+
 
 /*
 Fonction appelée pour créer le tableau initial
@@ -42,6 +69,7 @@ function initialSetup(dimension) {
     
     var body = document.getElementsByTagName('body')[0];
 	var tbl = document.createElement('table');
+    tbl.id = "table";
 	var tbdy = document.createElement('tbody');
 
 	//Création de la représentation 2D de la grille de jeu
@@ -99,6 +127,8 @@ function generate_random_number(){
     return empty_cell;
 }
 
+
+//Fonction appelée lors d'une entrée de l'utilisateur.
 function upArrowPressed(){
     var hasMoved = moveValuesUp();
 
@@ -109,14 +139,19 @@ function upArrowPressed(){
                 grille_jeu[i-1][j]+=grille_jeu[i][j];
                 grille_jeu[i][j]=0;
                 hasMoved = true;
+                score+=grille_jeu[i-1][j];
             }
         }
     }
-    if (moveValuesUp() || hasMoved)
+    if (moveValuesUp() || hasMoved){
         updateGame();
+    }else{
+        checkIfGameIsOver();
+
+    }
 }
 
-
+//Fonction appelée lors d'une entrée de l'utilisateur.
 function downArrowPressed(){
     var hasMoved = moveValuesDown();
 
@@ -127,13 +162,19 @@ function downArrowPressed(){
                 grille_jeu[i][j]+=grille_jeu[i-1][j];
                 grille_jeu[i-1][j]=0;
                 hasMoved = true;
+                score+=grille_jeu[i][j];
             }
         }
     }
-    if (moveValuesDown() || hasMoved)
+    if (moveValuesDown() || hasMoved){
         updateGame();
+    }else{
+        checkIfGameIsOver();
+
+    }
 }
 
+//Fonction appelée lors d'une entrée de l'utilisateur.
 function leftArrowPressed(){
     var hasMoved = moveValuesToLeft();
     
@@ -144,14 +185,20 @@ function leftArrowPressed(){
                 grille_jeu[i][j-1]+=grille_jeu[i][j];
                 grille_jeu[i][j]=0;
                 hasMoved = true;
+                score+=grille_jeu[i][j-1];
 
             }
         }
     }
-    if (moveValuesToLeft() || hasMoved)
+    if (moveValuesToLeft() || hasMoved){
         updateGame();
+    }else{
+        checkIfGameIsOver();
+
+    }
 }
 
+//Fonction appelée lors d'une entrée de l'utilisateur.
 function rightArrowPressed(){
     var hasMoved = moveValuesToRight();
     
@@ -162,20 +209,27 @@ function rightArrowPressed(){
                 grille_jeu[i][j]+=grille_jeu[i][j-1];
                 grille_jeu[i][j-1]=0;
                 hasMoved = true;
+                score+= grille_jeu[i][j];
             }
         }
     }
     if (moveValuesToRight() || hasMoved){
         updateGame();
-    } else {
+    } else{
         checkIfGameIsOver();
+
     }
 }
 
+/*
+Fonction appelée pour mettre à jour la boîte de score, 
+appelle la méthode pour générer un nouveau chiffre et appelle
+la méthode pour mettre à jour l'affichage.
+*/
 function updateGame(){
-    if(generate_random_number()==false){
-        checkIfGameIsOver();
-   	}
+    var scorebox = document.getElementById('scorebox');
+    scorebox.innerHTML="Score = "+score;
+    generate_random_number();
    	update_screen();
 }
 
@@ -268,13 +322,27 @@ function update_screen(){
 				tds[dimension*i+j].innerHTML=grille_jeu[i][j];
 
                 //Gestion des couleurs pour faciliter la visibilité
-				if(grille_jeu[i][j]>8){
-					tds[dimension*i+j].style.backgroundColor='orange';
-				}else if(grille_jeu[i][j]>16){
-					tds[dimension*i+j].style.backgroundColor='red';
-				}else{
-					tds[dimension*i+j].style.backgroundColor='yellow';
-				}
+				if(grille_jeu[i][j]<8){
+					tds[dimension*i+j].style.backgroundColor="#ffffe6";
+				}else if(grille_jeu[i][j]<16){
+					tds[dimension*i+j].style.backgroundColor="#ffff4d";
+				}else if(grille_jeu[i][j]<32){
+                    tds[dimension*i+j].style.backgroundColor="#e6e600";
+                }else if(grille_jeu[i][j]<64){
+                    tds[dimension*i+j].style.backgroundColor="#999900";
+                }else if(grille_jeu[i][j]<92){
+					tds[dimension*i+j].style.backgroundColor="#ffbf80";
+				}else if(grille_jeu[i][j]<128){
+                    tds[dimension*i+j].style.backgroundColor="#ff8000";
+                }else if(grille_jeu[i][j]<256){
+                    tds[dimension*i+j].style.backgroundColor="#ff8080";
+                }else if(grille_jeu[i][j]<512){
+                    tds[dimension*i+j].style.backgroundColor="#ff0000";
+                }else if(grille_jeu[i][j]<1024){
+                    tds[dimension*i+j].style.backgroundColor="#b3ff99";
+                }else{
+                    tds[dimension*i+j].style.backgroundColor="#40ff00";
+                }
 				
 			};
 		};
@@ -284,20 +352,35 @@ function update_screen(){
 //Lorsque le jeu est plein, vérifie s'il existe encore des déplacements possibles
 function checkIfGameIsOver(){
     var gameIsOver = true;
-    
+    var victory = false;
     for(var i = 0 ; i < dimension; i++){
-        for(var j = 1 ; j < dimension; j++){
-            if (j > 0 && grille_jeu[i][j-1]==grille_jeu[i][j] && grille_jeu[i][j]!=0){
-                gameIsOver = false;
+        for(var j = 0 ; j < dimension; j++){
+            if(grille_jeu[i][j]==2048){
+                victory=true;
+                break;
             }
-            if (i > 0 && grille_jeu[i][j]==grille_jeu[i-1][j] && grille_jeu[i][j]!=0){
+
+            if (j > 0 && grille_jeu[i][j-1]==grille_jeu[i][j]){
                 gameIsOver = false;
+                break;
+            }
+            if (i > 0 && grille_jeu[i][j]==grille_jeu[i-1][j]){
+                gameIsOver = false;
+                break;
+            }
+            if(grille_jeu[i][j]==0){
+                gameIsOver=false;
+                break;
             }
         }
     }
-    if (gameIsOver){
+    if (gameIsOver && !victory){
         alert("Le jeu est plein!");
-        startNewGame();
+        clearGame();
+    }
+    if(victory){
+        alert("Une case 2048 a été créée ; vous êtes un Champion!!");
+        clearGame();
     }
 }
 
@@ -308,13 +391,25 @@ document.onkeydown = function(e) {
         case 37:
             leftArrowPressed();
             break;
+        case 65:
+            leftArrowPressed();
+            break;
         case 38:
+            upArrowPressed();
+            break;
+        case 87:
             upArrowPressed();
             break;
         case 39:
             rightArrowPressed();
             break;
-        case 40:
+        case 68:
+            rightArrowPressed();
+            break;
+        case 40 :
+            downArrowPressed();
+            break;
+        case 83:
             downArrowPressed();
             break;
         default:
