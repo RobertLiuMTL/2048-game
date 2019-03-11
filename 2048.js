@@ -34,7 +34,7 @@ function startNewGame(){
 	}while(dimension!=null&&(isNaN(dimension)|| dimension=="" || dimension<3));
 
     if(dimension==null){
-        alert("Vous avez choisi de ne pas jouer au jeu ; honete à vous!");
+        alert("Vous avez choisi de ne pas jouer au jeu ; honte à vous!");
         window.close();
     }else{
         document.getElementById("dimensions_jeu").innerHTML = "Le jeu 2048 avec en dimensions "+dimension+"X"+dimension;
